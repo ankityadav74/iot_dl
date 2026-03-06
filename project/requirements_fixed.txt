@@ -1,0 +1,44 @@
+# ===================================================
+# TEMPORAL GRAPH TRANSFORMER - Requirements
+# Optimized for H100 GPU
+# ===================================================
+
+# ===== Core Deep Learning =====
+torch>=2.2.0
+torchvision>=0.17.0
+torchaudio>=2.2.0
+
+# ===== Graph Neural Networks =====
+# Install PyG from wheel (pyg-lib has compatibility issues)
+torch-geometric>=2.5.0
+torch-scatter
+torch-sparse
+torch-cluster
+dgl>=2.1.0
+
+# ===== Data Processing =====
+numpy>=1.26.0
+pandas>=2.1.0
+scikit-learn>=1.4.0
+imbalanced-learn>=0.12.0
+scipy>=1.11.0
+
+# ===== Visualization =====
+matplotlib>=3.8.0
+seaborn>=0.13.0
+networkx>=3.2.0
+plotly>=5.18.0
+
+# ===== Optimization & Monitoring =====
+optuna>=3.5.0
+wandb>=0.16.0
+tensorboard>=2.15.0
+
+# ===== Utilities =====
+pyyaml>=6.0.0
+tqdm>=4.66.0
+einops>=0.7.0
+
+# ===== GPU Acceleration (Optional - for H100) =====
+# Uncomment if you want RAPIDS (requires conda install)
+# cupy-cuda12x>=13.0.0
