@@ -1,0 +1,324 @@
+
+================================================================================
+WSN-DS NOVEL RESEARCH IDS — ALL 3 CONTRIBUTIONS
+================================================================================
+
+================================================================================
+LOADING WSN-DS DATASET
+================================================================================
+✓ Dataset loaded: 374661 samples, 19 features
+  Columns: [' id', ' Time', ' Is_CH', ' who CH', ' Dist_To_CH', ' ADV_S', ' ADV_R', ' JOIN_S', ' JOIN_R', ' SCH_S', ' SCH_R', 'Rank', ' DATA_S', ' DATA_R', ' Data_Sent_To_BS', ' dist_CH_To_BS', ' send_code ', 'Expaned Energy', 'Attack type']
+⚠️ Using last column as target: 'Attack type'
+
+🎯 Target Column: 'Attack type'
+
+📊 Class Distribution:
+Attack type
+Normal       340066
+Grayhole      14596
+Blackhole     10049
+TDMA           6638
+Flooding       3312
+Name: count, dtype: int64
+
+📊 Distribution (%):
+Attack type
+Normal       90.77
+Grayhole      3.90
+Blackhole     2.68
+TDMA          1.77
+Flooding      0.88
+Name: count, dtype: float64
+✓ No missing values
+
+🏷️  Classes: {'Blackhole': np.int64(0), 'Flooding': np.int64(1), 'Grayhole': np.int64(2), 'Normal': np.int64(3), 'TDMA': np.int64(4)}
+✓ Saved: wsn_new_plots/class_distribution.png
+
+================================================================================
+FEATURE ENGINEERING
+================================================================================
+✓ Original features  : 18
+✓ Engineered features: 32
+✓ Saved: wsn_new_plots/correlation_matrix.png
+
+📊 Train: 299728  Test: 74933
+
+================================================================================
+SMOTE-TOMEK CLASS BALANCING
+================================================================================
+  Before: {np.int64(3): 272052, np.int64(2): 11677, np.int64(4): 5310, np.int64(1): 2650, np.int64(0): 8039}
+  After : {np.int64(3): 272052, np.int64(2): 11677, np.int64(4): 10000, np.int64(1): 10000, np.int64(0): 10000}
+✓ Feature scaling complete
+
+============================================================
+TRAINING: Random Forest
+============================================================
+  Train Acc : 0.9984
+  Test  Acc : 0.9963
+  Diff      : 0.0021  [✓ GOOD FIT]
+  F1        : 0.9963
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      1.00      2010
+           1       0.93      0.99      0.96       662
+           2       0.97      0.99      0.98      2919
+           3       1.00      1.00      1.00     68014
+           4       0.99      0.93      0.96      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.98      0.98      0.98     74933
+weighted avg       1.00      1.00      1.00     74933
+
+  CV: 0.9960 ± 0.0001
+
+============================================================
+TRAINING: LightGBM
+============================================================
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.187116 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7677
+[LightGBM] [Info] Number of data points in the train set: 313729, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+  Train Acc : 0.9986
+  Test  Acc : 0.9954
+  Diff      : 0.0031  [✓ GOOD FIT]
+  F1        : 0.9955
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      2010
+           1       0.84      0.98      0.91       662
+           2       0.99      0.99      0.99      2919
+           3       1.00      1.00      1.00     68014
+           4       0.95      0.94      0.94      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.95      0.98      0.97     74933
+weighted avg       1.00      1.00      1.00     74933
+
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.129448 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7672
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.179437 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7666
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.127288 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7500
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.128074 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7670
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.120034 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7663
+[LightGBM] [Info] Number of data points in the train set: 250984, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+  CV: 0.9954 ± 0.0001
+
+============================================================
+TRAINING: Extra Trees
+============================================================
+  Train Acc : 0.9994
+  Test  Acc : 0.9965
+  Diff      : 0.0029  [✓ GOOD FIT]
+  F1        : 0.9965
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      1.00      2010
+           1       0.94      0.98      0.96       662
+           2       0.98      0.99      0.99      2919
+           3       1.00      1.00      1.00     68014
+           4       0.98      0.92      0.95      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.98      0.98      0.98     74933
+weighted avg       1.00      1.00      1.00     74933
+
+  CV: 0.9964 ± 0.0002
+
+============================================================
+TRAINING: AdaBoost
+============================================================
+  Train Acc : 0.9787
+  Test  Acc : 0.9796
+  Diff      : -0.0008  [✓ GOOD FIT]
+  F1        : 0.9798
+              precision    recall  f1-score   support
+
+           0       0.93      0.89      0.91      2010
+           1       0.90      0.98      0.94       662
+           2       0.75      0.82      0.78      2919
+           3       0.99      0.99      0.99     68014
+           4       1.00      0.85      0.92      1328
+
+    accuracy                           0.98     74933
+   macro avg       0.92      0.91      0.91     74933
+weighted avg       0.98      0.98      0.98     74933
+
+  CV: 0.9784 ± 0.0014
+
+============================================================
+TRAINING: MLP Neural Network
+============================================================
+  Train Acc : 0.9959
+  Test  Acc : 0.9958
+  Diff      : 0.0001  [✓ GOOD FIT]
+  F1        : 0.9958
+              precision    recall  f1-score   support
+
+           0       0.96      0.99      0.97      2010
+           1       0.91      1.00      0.95       662
+           2       0.98      0.97      0.97      2919
+           3       1.00      1.00      1.00     68014
+           4       1.00      0.93      0.96      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.97      0.98      0.97     74933
+weighted avg       1.00      1.00      1.00     74933
+
+  CV: 0.9940 ± 0.0025
+
+============================================================
+TRAINING: XGBoost
+============================================================
+  Train Acc : 0.9977
+  Test  Acc : 0.9969
+  Diff      : 0.0008  [✓ GOOD FIT]
+  F1        : 0.9969
+              precision    recall  f1-score   support
+
+           0       0.98      0.99      0.99      2010
+           1       0.94      1.00      0.96       662
+           2       0.99      0.98      0.99      2919
+           3       1.00      1.00      1.00     68014
+           4       1.00      0.93      0.96      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.98      0.98      0.98     74933
+weighted avg       1.00      1.00      1.00     74933
+
+  CV: 0.9967 ± 0.0002
+
+================================================================================
+BUILDING STACKING ENSEMBLE
+================================================================================
+
+============================================================
+TRAINING: Stacking Ensemble
+============================================================
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.036182 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7650
+[LightGBM] [Info] Number of data points in the train set: 209152, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] [LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.036121 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+Start training from score -1.609438
+[LightGBM] [Info] Total Bins 7072
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Number of data points in the train set: 209153, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.028048 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7666
+[LightGBM] [Info] Number of data points in the train set: 209153, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+  Train Acc : 0.9998
+  Test  Acc : 0.9973
+  Diff      : 0.0024  [✓ GOOD FIT]
+  F1        : 0.9973
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      2010
+           1       0.95      0.97      0.96       662
+           2       0.99      0.99      0.99      2919
+           3       1.00      1.00      1.00     68014
+           4       0.99      0.93      0.96      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.99      0.98      0.98     74933
+weighted avg       1.00      1.00      1.00     74933
+
+❌ Stacking Ensemble: StackingClassifier.__init__() got an unexpected keyword argument 'final_estimator__C'
+✓ Saved: wsn_new_plots/model_comparison.png
+✓ Saved: wsn_new_plots/cm_Random_Forest.png
+✓ Saved: wsn_new_plots/cm_LightGBM.png
+✓ Saved: wsn_new_plots/cm_Extra_Trees.png
+✓ Saved: wsn_new_plots/cm_AdaBoost.png
+✓ Saved: wsn_new_plots/cm_MLP_Neural_Network.png
+✓ Saved: wsn_new_plots/cm_XGBoost.png
+✓ Saved: wsn_new_plots/feature_importance.png
+✓ Saved: wsn_new_plots/train_vs_test.png
+✓ Saved: wsn_new_plots/roc_curves.png
+✓ Saved: wsn_new_plots/cv_scores.png
+
+================================================================================
+RUNNING NOVEL CONTRIBUTION 1: UNCERTAINTY-AWARE ENSEMBLE
+================================================================================
+Traceback (most recent call last):
+  File "/root/amlan/Iot/project/Scripts/wsn_research.py", line 1387, in <module>
+    results_df, energy_df, ua_results, drift_results = main()
+                                                       ^^^^^^
+  File "/root/amlan/Iot/project/Scripts/wsn_research.py", line 1241, in main
+    ('gb', trained_models['Gradient Boosting'])
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'Gradient Boosting'
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.246340 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7677
+[LightGBM] [Info] Number of data points in the train set: 313729, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438

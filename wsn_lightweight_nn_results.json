@@ -1,0 +1,38 @@
+[
+    {
+        "model_name": "Tiny-NN (1 layer)",
+        "train_accuracy": 0.9884528639299631,
+        "test_accuracy": 0.9879225441394313,
+        "train_time_seconds": 40.1984007358551,
+        "total_inference_time_seconds": 0.17576217651367188,
+        "inference_per_sample_ms": 0.0023455910815484747,
+        "total_parameters": 773,
+        "hidden_layers": "(32,)",
+        "n_iterations": 47,
+        "loss": 0.03736005877366279
+    },
+    {
+        "model_name": "Small-NN (2 layers)",
+        "train_accuracy": 0.9958996156515241,
+        "test_accuracy": 0.9955159942882308,
+        "train_time_seconds": 145.0390796661377,
+        "total_inference_time_seconds": 0.1423015594482422,
+        "inference_per_sample_ms": 0.0018990506111892249,
+        "total_parameters": 3461,
+        "hidden_layers": "(64, 32)",
+        "n_iterations": 51,
+        "loss": 0.019224659013993048
+    },
+    {
+        "model_name": "Medium-NN (3 layers)",
+        "train_accuracy": 0.9967103507179843,
+        "test_accuracy": 0.9961832570429584,
+        "train_time_seconds": 1076.5482249259949,
+        "total_inference_time_seconds": 0.5525407791137695,
+        "inference_per_sample_ms": 0.007373797647415285,
+        "total_parameters": 12933,
+        "hidden_layers": "(128, 64, 32)",
+        "n_iterations": 61,
+        "loss": 0.016553153176545942
+    }
+]

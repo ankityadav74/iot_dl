@@ -1,0 +1,223 @@
+{
+    "model_accuracy": {
+        "train": 0.9993327283403619,
+        "test": 0.9971441154097661
+    },
+    "top_10_features": [
+        {
+            "feature": " ADV_S",
+            "importance": 0.17819073600400562
+        },
+        {
+            "feature": " Is_CH",
+            "importance": 0.1543939063621263
+        },
+        {
+            "feature": "Expaned Energy",
+            "importance": 0.1424280250591217
+        },
+        {
+            "feature": " Data_Sent_To_BS",
+            "importance": 0.10582529734366186
+        },
+        {
+            "feature": " SCH_S",
+            "importance": 0.07116974443528049
+        },
+        {
+            "feature": " DATA_S",
+            "importance": 0.05285868515466077
+        },
+        {
+            "feature": " dist_CH_To_BS",
+            "importance": 0.04264113379985456
+        },
+        {
+            "feature": "Rank",
+            "importance": 0.037898009669906835
+        },
+        {
+            "feature": " DATA_R",
+            "importance": 0.03256031044332682
+        },
+        {
+            "feature": " ADV_R",
+            "importance": 0.03243179676809729
+        }
+    ],
+    "top_10_permutation": [
+        {
+            "feature": " Data_Sent_To_BS",
+            "importance_mean": 0.028833758157287236,
+            "importance_std": 0.0002467392950805706
+        },
+        {
+            "feature": "Expaned Energy",
+            "importance_mean": 0.018376416265196992,
+            "importance_std": 0.00016774725541451738
+        },
+        {
+            "feature": " SCH_S",
+            "importance_mean": 0.01598494655225342,
+            "importance_std": 9.675079850210975e-05
+        },
+        {
+            "feature": " ADV_S",
+            "importance_mean": 0.009258937984599624,
+            "importance_std": 0.00011017718463452731
+        },
+        {
+            "feature": " DATA_R",
+            "importance_mean": 0.009096125872446126,
+            "importance_std": 8.549299976269092e-05
+        },
+        {
+            "feature": " dist_CH_To_BS",
+            "importance_mean": 0.004174395793575658,
+            "importance_std": 6.613647761796283e-05
+        },
+        {
+            "feature": " Is_CH",
+            "importance_mean": 0.002476879345548766,
+            "importance_std": 6.836106108053307e-05
+        },
+        {
+            "feature": " Time",
+            "importance_mean": 0.002327412488489755,
+            "importance_std": 0.00010861430851230293
+        },
+        {
+            "feature": " ADV_R",
+            "importance_mean": 0.00132118025436061,
+            "importance_std": 7.111906687023477e-05
+        },
+        {
+            "feature": " who CH",
+            "importance_mean": 0.0007900391015975173,
+            "importance_std": 3.2028612226930873e-05
+        }
+    ],
+    "high_correlations": [
+        {
+            "feature1": " id",
+            "feature2": " who CH",
+            "correlation": 0.9999999942307556
+        },
+        {
+            "feature1": " JOIN_S",
+            "feature2": " SCH_R",
+            "correlation": 0.8983214751481124
+        }
+    ],
+    "sample_explanations": [
+        {
+            "sample_id": 0,
+            "prediction": 3,
+            "actual": 3,
+            "correct": true,
+            "decision_path": [
+                "Rank > -0.63 (value: -0.46)",
+                " Time <= -0.00 (value: -0.96)",
+                " Time > -0.99 (value: -0.96)",
+                " who CH <= -0.40 (value: -0.44)",
+                "Rank <= 5.22 (value: -0.46)",
+                "Expaned Energy <= -0.10 (value: -0.13)",
+                " Time <= -0.82 (value: -0.96)",
+                "Expaned Energy <= -0.10 (value: -0.13)",
+                " who CH <= -0.43 (value: -0.44)",
+                " send_code  <= 1.25 (value: -0.62)",
+                " ADV_R <= 0.08 (value: -0.27)",
+                " Time <= -0.93 (value: -0.96)",
+                "Expaned Energy > -0.40 (value: -0.13)",
+                " who CH <= -0.44 (value: -0.44)",
+                " Data_Sent_To_BS <= -0.18 (value: -0.23)",
+                " id <= -0.44 (value: -0.44)",
+                " Time > -0.96 (value: -0.96)",
+                " who CH > -0.44 (value: -0.44)"
+            ]
+        },
+        {
+            "sample_id": 1,
+            "prediction": 3,
+            "actual": 3,
+            "correct": true,
+            "decision_path": [
+                "Rank > -0.63 (value: 1.65)",
+                " Time <= -0.00 (value: -0.96)",
+                " Time > -0.99 (value: -0.96)",
+                " who CH <= -0.40 (value: -0.44)",
+                "Rank <= 5.22 (value: 1.65)",
+                "Expaned Energy <= -0.10 (value: -0.41)",
+                " Time <= -0.82 (value: -0.96)",
+                "Expaned Energy <= -0.10 (value: -0.41)",
+                " who CH <= -0.43 (value: -0.44)",
+                " send_code  <= 1.25 (value: -0.62)",
+                " ADV_R <= 0.08 (value: -0.84)",
+                " Time <= -0.93 (value: -0.96)",
+                "Expaned Energy <= -0.40 (value: -0.41)",
+                " id > -0.44 (value: -0.44)",
+                "Expaned Energy <= -0.41 (value: -0.41)"
+            ]
+        },
+        {
+            "sample_id": 2,
+            "prediction": 3,
+            "actual": 3,
+            "correct": true,
+            "decision_path": [
+                "Rank > -0.63 (value: -0.18)",
+                " Time <= -0.00 (value: -1.12)",
+                " Time <= -0.99 (value: -1.12)",
+                " Dist_To_CH <= 1.39 (value: -0.24)",
+                " Dist_To_CH <= 1.39 (value: -0.24)",
+                " ADV_R <= -0.49 (value: -0.56)",
+                " send_code  <= 0.00 (value: -0.21)",
+                " id <= -0.44 (value: -0.45)",
+                " ADV_R > -0.77 (value: -0.56)",
+                " id <= -0.45 (value: -0.45)",
+                " DATA_S > -0.20 (value: 0.40)",
+                " DATA_S > -0.15 (value: 0.40)"
+            ]
+        },
+        {
+            "sample_id": 3,
+            "prediction": 3,
+            "actual": 3,
+            "correct": true,
+            "decision_path": [
+                "Rank > -0.63 (value: 0.56)",
+                " Time <= -0.00 (value: -0.73)",
+                " Time > -0.99 (value: -0.73)",
+                " who CH <= -0.40 (value: -0.43)",
+                "Rank <= 5.22 (value: 0.56)",
+                "Expaned Energy <= -0.10 (value: -0.38)",
+                " Time > -0.82 (value: -0.73)",
+                " send_code  <= 1.25 (value: -0.21)",
+                " Dist_To_CH <= 0.36 (value: 0.18)",
+                "Expaned Energy <= -0.16 (value: -0.38)",
+                " who CH <= -0.42 (value: -0.43)",
+                " SCH_R > -0.57 (value: 0.58)",
+                " who CH > -0.43 (value: -0.43)",
+                " send_code  <= 0.42 (value: -0.21)"
+            ]
+        },
+        {
+            "sample_id": 4,
+            "prediction": 0,
+            "actual": 0,
+            "correct": true,
+            "decision_path": [
+                "Rank <= -0.63 (value: -0.66)",
+                " Data_Sent_To_BS <= 0.10 (value: -0.23)",
+                " DATA_R > 0.72 (value: 1.47)",
+                " dist_CH_To_BS <= 0.34 (value: -0.45)",
+                " ADV_S <= 1.08 (value: 0.36)",
+                " SCH_S > 0.08 (value: 0.26)",
+                "Expaned Energy > -0.44 (value: 2.17)",
+                "Expaned Energy > -0.44 (value: 2.17)",
+                " DATA_R <= 1.74 (value: 1.47)",
+                "Expaned Energy > -0.43 (value: 2.17)"
+            ]
+        }
+    ]
+}

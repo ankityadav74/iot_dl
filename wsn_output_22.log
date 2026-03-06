@@ -1,0 +1,543 @@
+
+================================================================================
+WSN-DS NOVEL RESEARCH IDS — ALL 3 CONTRIBUTIONS
+================================================================================
+
+================================================================================
+LOADING WSN-DS DATASET
+================================================================================
+✓ Dataset loaded: 374661 samples, 19 features
+  Columns: [' id', ' Time', ' Is_CH', ' who CH', ' Dist_To_CH', ' ADV_S', ' ADV_R', ' JOIN_S', ' JOIN_R', ' SCH_S', ' SCH_R', 'Rank', ' DATA_S', ' DATA_R', ' Data_Sent_To_BS', ' dist_CH_To_BS', ' send_code ', 'Expaned Energy', 'Attack type']
+⚠️ Using last column as target: 'Attack type'
+
+🎯 Target Column: 'Attack type'
+
+📊 Class Distribution:
+Attack type
+Normal       340066
+Grayhole      14596
+Blackhole     10049
+TDMA           6638
+Flooding       3312
+Name: count, dtype: int64
+
+📊 Distribution (%):
+Attack type
+Normal       90.77
+Grayhole      3.90
+Blackhole     2.68
+TDMA          1.77
+Flooding      0.88
+Name: count, dtype: float64
+✓ No missing values
+
+🏷️  Classes: {'Blackhole': np.int64(0), 'Flooding': np.int64(1), 'Grayhole': np.int64(2), 'Normal': np.int64(3), 'TDMA': np.int64(4)}
+✓ Saved: wsn_new_plots/class_distribution.png
+
+================================================================================
+FEATURE ENGINEERING
+================================================================================
+✓ Original features  : 18
+✓ Engineered features: 32
+✓ Saved: wsn_new_plots/correlation_matrix.png
+
+📊 Train: 299728  Test: 74933
+
+================================================================================
+SMOTE-TOMEK CLASS BALANCING
+================================================================================
+  Before: {np.int64(3): 272052, np.int64(2): 11677, np.int64(4): 5310, np.int64(1): 2650, np.int64(0): 8039}
+  After : {np.int64(3): 272052, np.int64(2): 11677, np.int64(4): 10000, np.int64(1): 10000, np.int64(0): 10000}
+✓ Feature scaling complete
+
+============================================================
+TRAINING: Random Forest
+============================================================
+  Train Acc : 0.9984
+  Test  Acc : 0.9962
+  Diff      : 0.0022  [✓ GOOD FIT]
+  F1        : 0.9962
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      1.00      2010
+           1       0.92      1.00      0.96       662
+           2       0.97      0.99      0.98      2919
+           3       1.00      1.00      1.00     68014
+           4       0.99      0.93      0.96      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.97      0.98      0.98     74933
+weighted avg       1.00      1.00      1.00     74933
+
+  CV: 0.9960 ± 0.0001
+
+============================================================
+TRAINING: LightGBM
+============================================================
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.116012 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7518
+[LightGBM] [Info] Number of data points in the train set: 313729, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+  Train Acc : 0.9986
+  Test  Acc : 0.9954
+  Diff      : 0.0032  [✓ GOOD FIT]
+  F1        : 0.9954
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      1.00      2010
+           1       0.86      0.98      0.91       662
+           2       0.99      0.99      0.99      2919
+           3       1.00      1.00      1.00     68014
+           4       0.94      0.94      0.94      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.96      0.98      0.97     74933
+weighted avg       1.00      1.00      1.00     74933
+
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.150212 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7668
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.224412 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7669
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.550607 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7662
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.497561 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7665
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.468647 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7674
+[LightGBM] [Info] Number of data points in the train set: 250984, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+  CV: 0.9955 ± 0.0002
+
+============================================================
+TRAINING: Extra Trees
+============================================================
+  Train Acc : 0.9994
+  Test  Acc : 0.9967
+  Diff      : 0.0027  [✓ GOOD FIT]
+  F1        : 0.9967
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      1.00      2010
+           1       0.93      0.98      0.95       662
+           2       0.99      0.99      0.99      2919
+           3       1.00      1.00      1.00     68014
+           4       0.98      0.93      0.95      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.98      0.98      0.98     74933
+weighted avg       1.00      1.00      1.00     74933
+
+  CV: 0.9964 ± 0.0002
+
+============================================================
+TRAINING: AdaBoost
+============================================================
+  Train Acc : 0.9801
+  Test  Acc : 0.9807
+  Diff      : -0.0006  [✓ GOOD FIT]
+  F1        : 0.9802
+              precision    recall  f1-score   support
+
+           0       0.94      0.87      0.90      2010
+           1       0.90      0.98      0.94       662
+           2       0.81      0.75      0.77      2919
+           3       0.99      1.00      0.99     68014
+           4       1.00      0.87      0.93      1328
+
+    accuracy                           0.98     74933
+   macro avg       0.93      0.89      0.91     74933
+weighted avg       0.98      0.98      0.98     74933
+
+  CV: 0.9794 ± 0.0009
+
+============================================================
+TRAINING: MLP Neural Network
+============================================================
+  Train Acc : 0.9964
+  Test  Acc : 0.9962
+  Diff      : 0.0002  [✓ GOOD FIT]
+  F1        : 0.9962
+              precision    recall  f1-score   support
+
+           0       0.97      0.99      0.98      2010
+           1       0.92      0.99      0.96       662
+           2       0.98      0.97      0.98      2919
+           3       1.00      1.00      1.00     68014
+           4       0.99      0.93      0.96      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.97      0.98      0.97     74933
+weighted avg       1.00      1.00      1.00     74933
+
+  CV: 0.9943 ± 0.0020
+
+============================================================
+TRAINING: XGBoost
+============================================================
+  Train Acc : 0.9977
+  Test  Acc : 0.9969
+  Diff      : 0.0008  [✓ GOOD FIT]
+  F1        : 0.9969
+              precision    recall  f1-score   support
+
+           0       0.98      0.99      0.99      2010
+           1       0.93      1.00      0.96       662
+           2       0.99      0.98      0.99      2919
+           3       1.00      1.00      1.00     68014
+           4       1.00      0.93      0.96      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.98      0.98      0.98     74933
+weighted avg       1.00      1.00      1.00     74933
+
+  CV: 0.9967 ± 0.0002
+
+================================================================================
+BUILDING STACKING ENSEMBLE
+================================================================================
+
+============================================================
+TRAINING: Stacking Ensemble
+============================================================
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.090565 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7077
+[LightGBM] [Info] Number of data points in the train set: 209153, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.029459 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7668
+[LightGBM] [Info] Number of data points in the train set: 209152, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.027588 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Total Bins 7668
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Number of data points in the train set: 209153, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.525146 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7518
+[LightGBM] [Info] Number of data points in the train set: 313729, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+  Train Acc : 0.9998
+  Test  Acc : 0.9974
+  Diff      : 0.0024  [✓ GOOD FIT]
+  F1        : 0.9974
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      2010
+           1       0.95      0.97      0.96       662
+           2       0.99      0.99      0.99      2919
+           3       1.00      1.00      1.00     68014
+           4       0.99      0.93      0.96      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.99      0.98      0.98     74933
+weighted avg       1.00      1.00      1.00     74933
+
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.028940 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7036
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.019016 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7684
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.023136 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7494
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.657590 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7668
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.009013 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.008609 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7657
+[LightGBM] [Info] Total Bins 7491
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.009342 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7031
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.499439 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7669
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.007274 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7494
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.011006 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7043
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.007774 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7683
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.573131 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7662
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.036582 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7034
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.045527 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7662
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.060212 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7685
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.009508 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7501
+[LightGBM] [Info] Number of data points in the train set: 167323, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.009274 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 7036
+[LightGBM] [Info] Number of data points in the train set: 167323, number of used features: 31
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.014859 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Total Bins 7664
+[LightGBM] [Info] Number of data points in the train set: 167322, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.225548 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7674
+[LightGBM] [Info] Number of data points in the train set: 250984, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.336120 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 7665
+[LightGBM] [Info] Number of data points in the train set: 250983, number of used features: 31
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
+[LightGBM] [Info] Start training from score -1.609438
