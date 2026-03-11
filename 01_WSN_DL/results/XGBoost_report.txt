@@ -1,0 +1,15 @@
+Model        : XGBoost
+Test Accuracy: 0.9968
+F1 Score     : 0.9968
+
+              precision    recall  f1-score   support
+
+   Blackhole       0.98      1.00      0.99      2010
+    Flooding       0.94      0.99      0.96       662
+    Grayhole       0.99      0.98      0.98      2919
+      Normal       1.00      1.00      1.00     68014
+        TDMA       0.99      0.93      0.96      1328
+
+    accuracy                           1.00     74933
+   macro avg       0.98      0.98      0.98     74933
+weighted avg       1.00      1.00      1.00     74933

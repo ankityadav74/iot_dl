@@ -1,0 +1,15 @@
+Model        : CNN_BiLSTM
+Test Accuracy: 0.9920
+F1 Score     : 0.9920
+
+              precision    recall  f1-score   support
+
+   Blackhole       0.90      0.92      0.91      2010
+    Flooding       0.91      1.00      0.95       662
+    Grayhole       0.93      0.92      0.93      2919
+      Normal       1.00      1.00      1.00     68014
+        TDMA       0.99      0.93      0.96      1328
+
+    accuracy                           0.99     74933
+   macro avg       0.95      0.95      0.95     74933
+weighted avg       0.99      0.99      0.99     74933

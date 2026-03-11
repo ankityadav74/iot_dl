@@ -1,0 +1,15 @@
+Model        : LSTM
+Test Accuracy: 0.9893
+F1 Score     : 0.9893
+
+              precision    recall  f1-score   support
+
+   Blackhole       0.84      0.89      0.86      2010
+    Flooding       0.91      1.00      0.95       662
+    Grayhole       0.91      0.87      0.89      2919
+      Normal       1.00      1.00      1.00     68014
+        TDMA       1.00      0.93      0.96      1328
+
+    accuracy                           0.99     74933
+   macro avg       0.93      0.94      0.93     74933
+weighted avg       0.99      0.99      0.99     74933

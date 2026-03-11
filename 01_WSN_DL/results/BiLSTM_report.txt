@@ -1,0 +1,15 @@
+Model        : BiLSTM
+Test Accuracy: 0.9875
+F1 Score     : 0.9876
+
+              precision    recall  f1-score   support
+
+   Blackhole       0.78      0.91      0.84      2010
+    Flooding       0.90      1.00      0.95       662
+    Grayhole       0.92      0.81      0.86      2919
+      Normal       1.00      1.00      1.00     68014
+        TDMA       0.99      0.93      0.96      1328
+
+    accuracy                           0.99     74933
+   macro avg       0.92      0.93      0.92     74933
+weighted avg       0.99      0.99      0.99     74933

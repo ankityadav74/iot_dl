@@ -1,0 +1,9 @@
+model_name,model_type,accuracy,f1_score,inf_time_us,model_size_kb,params_M,energy_score,deployment_tier
+Transformer_IDS,Deep Learning,0.964,0.9649,7.816,148.8,0.0381,2.2826,🟢 Edge
+CNN_1D,Deep Learning,0.988,0.9879,60.574,212.8,0.0545,0.8325,🟢 Edge
+CNN_BiLSTM_Attention,Deep Learning,0.993,0.993,10.444,537.6,0.1376,0.4989,🟡 Gateway
+LSTM,Deep Learning,0.987,0.987,11.476,529.0,0.1354,0.4845,🟡 Gateway
+CNN_BiLSTM,Deep Learning,0.989,0.989,31.986,520.5,0.1333,0.3575,🟡 Gateway
+BiLSTM,Deep Learning,0.985,0.9852,17.735,1313.0,0.3361,0.1591,🔴 Cloud
+XGBoost,Traditional ML,0.997,0.997,139.785,1329.3,13.2934,0.0105,🔴 Cloud
+Random Forest,Traditional ML,0.99,0.9903,122.64,21986.0,219.8601,0.0038,🔴 Cloud
