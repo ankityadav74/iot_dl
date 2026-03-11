@@ -1,0 +1,51 @@
+2026-03-11 23:34:36 | INFO     | ======================================================================
+2026-03-11 23:34:36 | INFO     | NOVEL CONTRIBUTIONS C4 / C5 / C6
+2026-03-11 23:34:36 | INFO     | ======================================================================
+2026-03-11 23:34:36 | INFO     | Device    : cuda:1
+2026-03-11 23:34:36 | INFO     | Output    : /root/amlan/Iot/runs/2026_03_11__23_15_08
+2026-03-11 23:34:36 | INFO     | Loading dataset …
+2026-03-11 23:34:48 | INFO     | ✓ Test samples  : 74,933
+2026-03-11 23:34:48 | INFO     | ✓ Features      : 33
+2026-03-11 23:34:48 | INFO     | ✓ Classes       : ['Blackhole', 'Flooding', 'Grayhole', 'Normal', 'TDMA']
+2026-03-11 23:34:49 | INFO     | ✓ Loaded CNN_BiLSTM_Attention (val_acc=0.9935)
+2026-03-11 23:34:49 | INFO     | 
+======================================================================
+2026-03-11 23:34:49 | INFO     | NOVEL C4: LIME LOCAL EXPLAINABILITY
+2026-03-11 23:34:49 | INFO     | ======================================================================
+2026-03-11 23:34:52 | INFO     | ✓ Saved: plots/C4_lime_explanations.png  [3.1s]
+2026-03-11 23:34:52 | INFO     | ✓ Saved: results/C4_lime.json
+2026-03-11 23:34:52 | INFO     | 
+======================================================================
+2026-03-11 23:34:52 | INFO     | NOVEL C5: ADVERSARIAL ROBUSTNESS (FGSM)
+2026-03-11 23:34:52 | INFO     | ======================================================================
+2026-03-11 23:34:52 | INFO     |    ε=0.000  →  Accuracy: 0.9970
+2026-03-11 23:34:52 | INFO     |    ε=0.005  →  Accuracy: 0.9910
+2026-03-11 23:34:52 | INFO     |    ε=0.010  →  Accuracy: 0.9820
+2026-03-11 23:34:52 | INFO     |    ε=0.020  →  Accuracy: 0.9750
+2026-03-11 23:34:52 | INFO     |    ε=0.050  →  Accuracy: 0.9655
+2026-03-11 23:34:52 | INFO     |    ε=0.100  →  Accuracy: 0.9605
+2026-03-11 23:34:52 | INFO     |    ε=0.150  →  Accuracy: 0.9050
+2026-03-11 23:34:52 | INFO     |    ε=0.200  →  Accuracy: 0.8480
+2026-03-11 23:34:52 | INFO     |    ε=0.300  →  Accuracy: 0.6420
+2026-03-11 23:34:53 | INFO     | ✓ Saved: plots/C5_adversarial_robustness.png  [1.2s]
+2026-03-11 23:34:53 | INFO     | ✓ Saved: results/C5_adversarial.json
+2026-03-11 23:34:53 | INFO     | 
+======================================================================
+2026-03-11 23:34:53 | INFO     | NOVEL C6: ATTENTION WEIGHT VISUALIZATION
+2026-03-11 23:34:53 | INFO     | ======================================================================
+2026-03-11 23:34:57 | INFO     | ✓ Saved: plots/C6_attention_visualization.png  [4.0s]
+2026-03-11 23:34:58 | INFO     | ✓ Saved: plots/C6_attention_comparison.png
+2026-03-11 23:34:58 | INFO     | ✓ Saved: results/C6_attention.json
+2026-03-11 23:34:58 | INFO     | 
+======================================================================
+2026-03-11 23:34:58 | INFO     | ✅  C4 / C5 / C6 COMPLETE — 21.2s total
+2026-03-11 23:34:58 | INFO     | ======================================================================
+2026-03-11 23:34:58 | INFO     | 
+📁 Output files:
+2026-03-11 23:34:58 | INFO     |    plots/C4_lime_explanations.png
+2026-03-11 23:34:58 | INFO     |    plots/C5_adversarial_robustness.png
+2026-03-11 23:34:58 | INFO     |    plots/C6_attention_visualization.png
+2026-03-11 23:34:58 | INFO     |    plots/C6_attention_comparison.png
+2026-03-11 23:34:58 | INFO     |    results/C4_lime.json
+2026-03-11 23:34:58 | INFO     |    results/C5_adversarial.json
+2026-03-11 23:34:58 | INFO     |    results/C6_attention.json
