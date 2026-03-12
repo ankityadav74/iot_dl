@@ -321,17 +321,6 @@ runs/
 
 ---
 
-## 🖥️ Hardware
-
-| Component | Spec |
-|---|---|
-| GPU | 2× NVIDIA H100 PCIe (84.9 GB each) |
-| RAM | ~1 TB |
-| PyTorch | 2.10.0+cu128 |
-| CUDA | 12.8 |
-| Training device | cuda:1 |
-
----
 
 ## 📂 Project Structure
 
