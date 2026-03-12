@@ -9,22 +9,22 @@
 
 ---
 
-##  Overview
+## 📌 Overview
 
 This project presents a **comprehensive deep learning pipeline** for intrusion detection in Wireless Sensor Networks (WSN) using the **WSN-DS dataset**. Beyond classification accuracy, the system addresses five critical dimensions for real-world deployment:
 
 | Dimension | Method | Result |
 |---|---|---|
-|  **Accuracy** | 8 models benchmarked | Up to **99.68%** |
-|  **Trustworthiness** | MC Dropout Uncertainty | 99.84% on high-confidence samples |
-|  **Adaptability** | Concept Drift Detection | +0.85% improvement on drifted data |
-|  **Deployability** | Energy-Complexity Framework | Edge / Gateway / Cloud tiering |
-|  **Explainability** | SHAP + LIME + Attention Viz | Per-class local & global explanations |
-|  **Robustness** | FGSM Adversarial Testing | Vulnerability boundary quantified |
+| 🎯 **Accuracy** | 8 models benchmarked | Up to **99.68%** |
+| 🔍 **Trustworthiness** | MC Dropout Uncertainty | 99.84% on high-confidence samples |
+| 🔄 **Adaptability** | Concept Drift Detection | +0.85% improvement on drifted data |
+| ⚡ **Deployability** | Energy-Complexity Framework | Edge / Gateway / Cloud tiering |
+| 🧠 **Explainability** | SHAP + LIME + Attention Viz | Per-class local & global explanations |
+| 🛡️ **Robustness** | FGSM Adversarial Testing | Vulnerability boundary quantified |
 
 ---
 
-##  Dataset — WSN-DS
+## 📊 Dataset — WSN-DS
 
 ### What is WSN-DS?
 
@@ -83,8 +83,8 @@ Flooding        3,312     0.88%   ▌
 
 | Attack | What it does | Key affected features |
 |---|---|---|
-| **Normal** | Legitimate WSN traffic | All features normal range |
-| **Blackhole** | Malicious node drops ALL packets it receives | DATA_R high, DATA_S→0 |
+| **Normal** | Legitimate WSN traffic | All features in normal range |
+| **Blackhole** | Malicious node drops ALL packets it receives | DATA_R high, DATA_S → 0 |
 | **Grayhole** | Selectively drops packets (harder to detect than Blackhole) | DATA_R > DATA_S (selective) |
 | **Flooding** | Sends excessive JOIN/ADV packets to exhaust node energy | JOIN_S, ADV_S very high |
 | **TDMA** | Disrupts time-slot scheduling to cause collisions | SCH_S, SCH_R anomalous |
@@ -113,7 +113,7 @@ RAW DATA (374,661 × 18)
          │
          ▼  Step 3
 ┌───────────────────┐
-│  Feature          │  18 → 33 features (only on train, applied to test)
+│  Feature          │  18 → 33 features (computed on train, applied to test)
 │  Engineering      │  +7 statistical, +3 interaction, +5 ratio features
 └────────┬──────────┘
          │
@@ -125,7 +125,7 @@ RAW DATA (374,661 × 18)
          │
          ▼  Step 5
 ┌───────────────────┐
-│  StandardScaler   │  fit on train, transform both train & test
+│  StandardScaler   │  fit() on train only, transform() both train & test
 │  Normalisation    │  mean=0, std=1 per feature
 └────────┬──────────┘
          │
@@ -141,29 +141,24 @@ RAW DATA (374,661 × 18)
 
 **What was done:**
 - Verified zero missing values across all 374,661 rows
-- Selected only numeric columns (dropped non-numeric if any)
+- Selected only numeric columns
 - Applied `LabelEncoder` to convert string class names to integers:
 
 ```
-Blackhole → 0
-Flooding  → 1
-Grayhole  → 2
-Normal    → 3
-TDMA      → 4
+Blackhole → 0 | Flooding → 1 | Grayhole → 2 | Normal → 3 | TDMA → 4
 ```
 
 **Why label encoding (not one-hot):**
-> Neural networks with `CrossEntropyLoss` expect integer class indices, not one-hot vectors. One-hot encoding would require softmax output to match a 5-dimensional target — CrossEntropyLoss handles this internally and more efficiently.
+> PyTorch's `CrossEntropyLoss` expects integer class indices directly — it applies
+> softmax + log internally. One-hot encoding would be redundant and wasteful.
 
 ---
 
 ### Step 2 — Stratified Train/Test Split (80/20)
 
 **What was done:**
-- Split dataset: 299,728 train / 74,933 test
-- `stratify=y` ensures proportions match original distribution
-
-**Before split → After split (class proportions preserved):**
+- Split: 299,728 train / 74,933 test
+- `stratify=y` ensures class proportions are identical in both splits
 
 | Class | Full Dataset | Train Set | Test Set |
 |---|---|---|---|
@@ -173,146 +168,141 @@ TDMA      → 4
 | TDMA | 1.77% | 1.77% | 1.77% |
 | Flooding | 0.88% | 0.88% | 0.88% |
 
-**Why stratification:**
-> Without stratification, a random split might place all 3,312 Flooding samples in train and none in test — making it impossible to evaluate Flooding detection. With stratification, each split is a faithful mini-copy of the original dataset.
-
-> ⚠️ **Important:** SMOTE is applied ONLY to the train set AFTER splitting.
-> Applying SMOTE before splitting would cause **data leakage** — synthetic samples derived from test data would contaminate training, making evaluation results artificially inflated.
+> ⚠️ **Critical:** SMOTE is applied ONLY to the **train set AFTER splitting**.
+> Applying SMOTE before splitting = **data leakage** — synthetic samples derived
+> from test data contaminate training → artificially inflated evaluation scores.
 
 ---
 
 ### Step 3 — Feature Engineering (18 → 33 features)
 
-**What was done:**
-Created 15 additional features from the original 18:
-
 #### Statistical Features (+7)
+
 | New Feature | Formula | Why useful |
 |---|---|---|
-| `stat_mean` | mean of all 18 features per row | Global traffic level indicator |
-| `stat_std` | std of all 18 features per row | Traffic variability — attacks cause unusual variance |
+| `stat_mean` | mean of all features per row | Global traffic activity level |
+| `stat_std` | std of all features per row | Traffic variability — attacks cause unusual variance |
 | `stat_max` | max feature value per row | Detects extreme outlier behaviour |
-| `stat_min` | min feature value per row | Detects dropped-to-zero features (Blackhole) |
-| `stat_range` | max − min per row | Overall feature spread |
+| `stat_min` | min feature value per row | Detects dropped-to-zero features (Blackhole: DATA_S→0) |
+| `stat_range` | max − min per row | Overall feature spread per record |
 | `stat_skew` | skewness per row | Flooding has highly skewed packet distributions |
-| `stat_kurt` | kurtosis per row | Detects heavy-tailed attack distributions |
+| `stat_kurt` | kurtosis per row | Detects heavy-tailed / impulsive attack patterns |
 
 #### Interaction Features (+3)
+
 | New Feature | Formula | Why useful |
 |---|---|---|
-| `inter_A_x_B` | top_var_feat_1 × top_var_feat_2 | Captures joint effect of two most variable features |
-| `inter_B_x_C` | top_var_feat_2 × top_var_feat_3 | Cross-feature anomaly detection |
+| `inter_A_x_B` | top_var_feat_1 × top_var_feat_2 | Joint effect of the two most variable features |
+| `inter_B_x_C` | top_var_feat_2 × top_var_feat_3 | Cross-feature anomaly signal |
 | `inter_C_x_D` | top_var_feat_3 × top_var_feat_4 | Non-linear feature combinations |
 
-> Top 4 features by variance are selected to compute interactions — these are the features that change the most between Normal and attack traffic.
+> Top 4 features by **variance** are selected — these vary the most between Normal and attack traffic and therefore carry the most discriminative signal.
 
 #### Ratio Features (+5)
+
 | New Feature | Formula | Why useful |
 |---|---|---|
-| `ratio_feat_i` | feat_i / (row_sum + 1e-10) | Normalises each feature relative to total row magnitude — attack traffic has abnormal ratios |
+| `ratio_feat_i` | feat_i / (row_sum + 1e-10) | Relative contribution of each feature — attack traffic has abnormal ratios (e.g. DATA_R >> DATA_S in Blackhole) |
 
-**Why feature engineering if neural networks auto-learn features?**
-> Neural networks can learn features — but need data and time. Statistical features encode **domain knowledge**: a Flooding attack has distinctly different row-level skewness than Normal traffic. Pre-computing these:
-> - Improves convergence speed
-> - Helps minority classes with few samples
-> - Acts as an inductive bias — tells the model these relationships matter
+**Why do feature engineering if neural networks learn features automatically?**
+> Neural networks can learn features — but need data and time. Statistical features
+> encode **domain knowledge**: Flooding has distinctly different row skewness than
+> Normal. Pre-computing this:
+> - Speeds up convergence
+> - Helps minority classes with few real samples
+> - Acts as an inductive bias, guiding the model toward known discriminative patterns
 
 ---
 
-### Step 4 — SMOTE Balancing
+### Step 4 — Manual SMOTE Balancing
 
 #### Before SMOTE (raw train split):
 ```
 Class       Samples    % of train
-──────────────────────────────────
+────────────────────────────────────────────────────
 Normal      272,052    90.77%   ← completely dominates
 Grayhole     11,677     3.90%
 Blackhole     8,039     2.68%
 TDMA          5,310     1.77%
-Flooding      2,650     0.88%   ← only 2,650 samples!
+Flooding      2,650     0.88%   ← only 2,650 real samples!
 ```
 
 #### After SMOTE (balanced train set):
 ```
 Class       Samples    Change
-──────────────────────────────
-Normal      272,052    unchanged (already large)
-Grayhole     11,677    unchanged (already at threshold)
-Blackhole    10,000    +1,961 synthetic samples
-TDMA         10,000    +4,690 synthetic samples
-Flooding     10,000    +7,350 synthetic samples
-──────────────────────────────
-Total        313,729   (+14,001 synthetic samples added)
+──────────────────────────────────────────────────────
+Normal      272,052    unchanged (already dominant)
+Grayhole     11,677    unchanged (above threshold)
+Blackhole    10,000    +1,961 synthetic samples added
+TDMA         10,000    +4,690 synthetic samples added
+Flooding     10,000    +7,350 synthetic samples added
+──────────────────────────────────────────────────────
+Total        313,729   +14,001 synthetic samples total
 ```
 
-#### How SMOTE Works:
+#### How SMOTE Generates Synthetic Samples:
 
 ```
 For each minority sample x_i:
-  1. Find k=5 nearest neighbours in same class
-  2. Pick one neighbour x_nn at random
-  3. Generate synthetic point:
-     x_synthetic = x_i + λ × (x_nn - x_i)   where λ ∈ [0,1] random
-  4. Repeat until target count reached
-```
+  1. Find k=5 nearest neighbours within the same class
+  2. Randomly pick one neighbour x_nn
+  3. Synthesise a new point along the line between them:
+       x_new = x_i + λ × (x_nn - x_i)    where λ ∈ [0, 1] random
 
-**Visually:**
-```
   x_i  ●────────────●  x_nn
-           ◆  ◆  ◆         ← synthetic points placed between real ones
+           ◆  ◆  ◆       ← new synthetic points placed between real ones
 ```
 
-**Why not just duplicate (random oversampling)?**
-> Duplication copies exact samples → model memorises them → fails on any variation.
-> SMOTE generates **new points between real ones** → model learns the boundary shape.
+**Why not random oversampling (duplication)?**
+> Duplication → model memorises exact copies → fails on slight variations.
+> SMOTE generates **new points between real ones** → model learns the actual
+> decision boundary shape of each minority class.
 
-**Why not class weights instead?**
+**Why not class weights?**
 > Class weights change the loss penalty but the model still sees 272,052 Normal
-> samples vs 2,650 Flooding samples. It memorises Normal thoroughly but barely
-> learns Flooding's decision boundary. SMOTE physically gives the model more
-> Flooding examples to learn from.
+> samples vs 2,650 Flooding samples. It thoroughly memorises Normal but barely
+> learns Flooding's boundary. SMOTE physically provides more Flooding examples.
 
-**Why cap at 10,000 (not equal to Normal's 272,052)?**
-> Fully equalising would require 270,000 synthetic Flooding samples — 100× more
-> synthetics than real ones. The synthetic distribution would drift far from reality.
-> Capping at 10,000 adds enough to improve minority learning without overwhelming
-> the training set with artificial data.
+**Why cap at 10,000 (not match Normal's 272,052)?**
+> Fully equalising Flooding would need ~270,000 synthetic samples — 100× more
+> synthetics than real ones. The synthetic distribution would drift far from
+> reality and introduce noise. Capping at 10,000 improves minority learning
+> without flooding the training set with artificial data.
 
 ---
 
 ### Step 5 — StandardScaler Normalisation
 
-**What was done:**
 ```python
 scaler = StandardScaler()
-scaler.fit(X_train)           # learn mean and std from TRAIN only
-X_train_sc = scaler.transform(X_train)
-X_test_sc  = scaler.transform(X_test)   # apply same transform to test
+scaler.fit(X_train_balanced)       # learn mean & std from TRAIN ONLY
+X_train_sc = scaler.transform(X_train_balanced)
+X_test_sc  = scaler.transform(X_test)    # same transform applied to test
 ```
 
-**Result:** Every feature has mean=0, std=1 across the training set.
+**Result:** Every feature → mean = 0, std = 1
 
 **Why normalise:**
-> Feature values span very different ranges:
-> - `dist_BS` (distance): 0 – 200 metres
-> - `DATA_S` (packet count): 0 – 10,000 packets
-> - `is_CH` (binary): 0 or 1
->
-> Without normalisation, gradient updates are dominated by large-magnitude features.
-> The model would learn "high DATA_S = attack" simply because it has large values,
-> ignoring the binary and small-range features entirely.
 
-**Why fit on train only (not full dataset)?**
-> Fitting the scaler on the full dataset would use test set statistics (mean, std)
-> during training — this is **data leakage**. The test set must be completely unseen.
-> In deployment, new data is scaled using the training set's mean and std — so we
-> simulate that exact scenario.
+| Feature | Raw Range | Problem Without Scaling |
+|---|---|---|
+| `dist_BS` | 0 – 200 m | Large values dominate gradients |
+| `DATA_S` | 0 – 10,000 | Overwhelms binary features |
+| `is_CH` | 0 or 1 | Gets ignored by optimiser |
 
-**Scaler is saved** to `models/scaler.pkl` so it can be reloaded for inference on new data without recomputing.
+Without normalisation, the model learns "high DATA_S = attack" because of scale,
+ignoring small-range but equally important binary/distance features entirely.
+
+**Why fit on train only?**
+> Fitting on the full dataset uses test set mean and std during training —
+> **data leakage**. In production, new packets are scaled using training statistics.
+> We simulate this exactly: `fit()` on train, `transform()` on both.
+
+> 💾 Scaler saved to `models/scaler.pkl` for reproducible inference on new data.
 
 ---
 
-##  System Architecture
+## 🏗️ System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -355,13 +345,12 @@ X_test_sc  = scaler.transform(X_test)   # apply same transform to test
 ┌────────▼───────┐ ┌───────▼──────┐ ┌──────────────┐
 │  C4: LIME      │ │  C5: FGSM    │ │  C6: Attn.   │
 │  Local XAI     │ │  Adversarial │ │  Visualization│
-│                │ │  Robustness  │ └──────────────┘
-└────────────────┘ └──────────────┘
+└────────────────┘ └──────────────┘ └──────────────┘
 ```
 
 ---
 
-##  Models
+## 🤖 Models
 
 ### Deep Learning Models
 
@@ -391,34 +380,48 @@ Input (B, F, 1)
       ▼
 ┌─────────────────────┐
 │   Conv1D Block      │  64 → 128 filters, BatchNorm, MaxPool
-│   (Local Patterns)  │  Learns local feature co-occurrences
+│   (Local Patterns)  │  Learns which feature groups co-activate
 └──────────┬──────────┘
            │
       ┌────▼──────────────────┐
       │  Channel Attention     │  Squeeze-and-Excitation
-      │  (Feature Reweighting) │  Which channels matter most?
+      │  (Feature Reweighting) │  Which feature channels matter most?
       └────┬──────────────────┘
            │
       ┌────▼──────────────────┐
-      │  Bidirectional LSTM   │  Forward + backward context
-      │  (Temporal Modelling)  │  64 units × 2 directions = 128
+      │  Bidirectional LSTM   │  Forward + backward temporal context
+      │  (Temporal Modelling)  │  64 units × 2 directions = 128 hidden
       └────┬──────────────────┘
            │
       ┌────▼──────────────────┐
-      │  Temporal Attention   │  score_t = tanh(W·h_t)
-      │  (Focus Mechanism)    │  context = Σ(softmax(score) × h)
+      │  Temporal Attention   │  score_t = tanh(W · h_t)
+      │  (Focus Mechanism)    │  context = Σ softmax(score_t) × h_t
       └────┬──────────────────┘
            │
       ┌────▼──────────────────┐
-      │  Classifier           │  FC(128→64) → FC(64→5)
+      │  Classifier Head      │  FC(128→64) → Dropout → FC(64→5)
       └───────────────────────┘
 ```
+
+**Key design decisions:**
+- **Channel Attention** — not all features matter equally: routing features dominate Blackhole detection; packet rate features dominate Flooding
+- **Temporal Attention over last hidden state** — avoids recency bias; model learns *which time steps* carry the attack signature
+- **Dual attention** — channel attention handles *what*, temporal attention handles *when*
 
 ---
 
 ## 🔬 Novel Contributions
 
 ### C1 — MC Dropout Uncertainty Quantification
+Detects zero-day / novel attacks the model has never seen.
+
+```python
+model.train()   # keep dropout ON during inference
+preds = [model(x) for _ in range(30)]   # 30 stochastic forward passes
+entropy    = -Σ p_i × log(p_i)
+confidence = 1 - (entropy / log(n_classes))
+# Flag as novel if confidence < 0.70
+```
 
 | Metric | Value |
 |---|---|
@@ -426,7 +429,16 @@ Input (B, F, 1)
 | High-confidence accuracy | **99.84%** |
 | Novel attacks flagged | 161 (1.6%) |
 
-### C2 — Concept Drift Detection
+---
+
+### C2 — Chunk-Based Concept Drift Detection
+Keeps IDS accurate as attack patterns evolve over time.
+
+```
+Stream → [Chunk 1][Chunk 2]...[Chunk 20]
+          monitor accuracy per chunk
+          if drop > 3% vs baseline → DRIFT → retrain adaptive model
+```
 
 | Metric | Value |
 |---|---|
@@ -435,7 +447,19 @@ Input (B, F, 1)
 | Adaptive avg accuracy | **98.16%** |
 | Improvement | **+0.85%** |
 
-### C3 — Energy-Complexity Trade-off
+---
+
+### C3 — Energy-Complexity Trade-off Framework
+
+```
+Energy Score = (Accuracy × F1) / (log(1+inf_time) × log(1+size) × log(1+FLOPs))
+```
+
+| Score | Tier | Suitable For |
+|---|---|---|
+| > 0.50 | 🟢 Edge | Sensor nodes, microcontrollers |
+| 0.20 – 0.50 | 🟡 Gateway | Raspberry Pi, edge servers |
+| < 0.20 | 🔴 Cloud | Central servers |
 
 | Model | Score | Tier |
 |---|---|---|
@@ -444,28 +468,41 @@ Input (B, F, 1)
 | XGBoost | 0.011 | 🔴 Cloud |
 | Random Forest | 0.004 | 🔴 Cloud |
 
+---
+
 ### C4 — LIME Local Explainability
-Per-sample local explanations for each attack class — answers *why THIS packet was flagged*.
+Per-sample local explanations — answers *why THIS specific packet was flagged* as an attack.
 
-### C5 — FGSM Adversarial Robustness
-```
-x_adversarial = x + ε × sign(∇ₓ Loss(x, y_true))
-```
-Quantifies accuracy degradation at ε = 0.0 → 0.3.
-
-### C6 — Attention Weight Visualization
-Reveals which temporal positions the model focuses on per attack type.
+> Unlike SHAP (global average), LIME perturbs the individual input and fits a
+> local linear surrogate. Essential for operational alert investigation.
 
 ---
 
-##  How to Run
+### C5 — FGSM Adversarial Robustness
+
+```
+x_adversarial = x + ε × sign(∇ₓ Loss(x, y_true))
+```
+
+Tests model resistance against crafted evasion attacks. Quantifies accuracy
+degradation at ε = 0.0 → 0.3, establishing the robustness boundary.
+
+---
+
+### C6 — Attention Weight Visualization
+Reveals which temporal positions the model focuses on per attack class —
+proving the model learned attack-specific signatures, not statistical shortcuts.
+
+---
+
+## 🚀 How to Run
 
 ### Prerequisites
 ```bash
 pip install torch numpy pandas scikit-learn xgboost shap lime matplotlib seaborn
 ```
 
-### Main Pipeline
+### Main Pipeline (all 8 models + C1/C2/C3)
 ```bash
 nohup python project/Scripts/wsn_dl_research.py > runs/console.log 2>&1 &
 tail -f runs/console.log
@@ -473,21 +510,19 @@ tail -f runs/console.log
 
 ### Novel Contributions C4 / C5 / C6
 ```bash
+# Run AFTER main pipeline completes
 python project/Scripts/wsn_novel_c4c5c6.py
 ```
 
 ### Monitor Progress
 ```bash
-# Live log
 tail -f runs/console.log
-
-# Check if still running
-ps aux | grep wsn | grep -v grep && echo "⏳ Running" || echo " Done"
+ps aux | grep wsn | grep -v grep && echo "⏳ Running" || echo "✅ Done"
 ```
 
 ---
 
-##  Output Structure
+## 📁 Output Structure
 
 ```
 runs/
@@ -497,7 +532,7 @@ runs/
     │   ├── training_history.png
     │   ├── model_comparison.png
     │   ├── roc_curves.png
-    │   ├── confusion_matrix_*.png     (8 matrices)
+    │   ├── confusion_matrix_*.png        (8 matrices)
     │   ├── C1_uncertainty.png
     │   ├── C2_concept_drift.png
     │   ├── C3_energy_tradeoff.png
@@ -507,9 +542,8 @@ runs/
     │   └── C6_attention_comparison.png
     ├── models/
     │   ├── CNN_BiLSTM_Attention.pth
-    │   ├── LSTM.pth
-    │   ├── scaler.pkl
-    │   └── ...
+    │   ├── LSTM.pth  /  BiLSTM.pth  /  ...
+    │   └── scaler.pkl
     └── results/
         ├── final_summary.json
         ├── C1_uncertainty.json
@@ -520,27 +554,28 @@ runs/
         └── C6_attention.json
 ```
 
+---
 
 
-##  Project Structure
+## 📂 Project Structure
 
 ```
 Iot/
 ├── project/
 │   ├── Scripts/
-│   │   ├── wsn_dl_research.py          # Main pipeline
-│   │   └── wsn_novel_c4c5c6.py        # C4 LIME + C5 FGSM + C6 Attention
+│   │   ├── wsn_dl_research.py        # Main pipeline
+│   │   └── wsn_novel_c4c5c6.py      # C4 LIME + C5 FGSM + C6 Attention
 │   └── data/
 │       └── raw/
 │           └── WSN-DS.csv
-├── runs/                               # All outputs auto-saved here
-├── WSN_IDS_Defense_Guide.md           # Complete Q&A defense guide
+├── runs/                             # All outputs auto-saved here
+├── WSN_IDS_Defense_Guide.md         # Complete professor Q&A guide
 └── README.md
 ```
 
 ---
 
-##  References
+## 📖 References
 
 1. Almomani, I. et al. — *WSN-DS: A Dataset for Intrusion Detection Systems in WSN* (2016)
 2. Hochreiter & Schmidhuber — *Long Short-Term Memory*, Neural Computation (1997)
@@ -554,10 +589,16 @@ Iot/
 
 ---
 
-## Author
+## 👥 Authors
 
-**Amlan Sarkar**  **Ankit**
-B.Tech — Computer Science & Engineering  
+**Amlan Sarkar**
+B.Tech — Computer Science & Engineering
+
+
+**Ankit**
+B.Tech — Computer Science & Engineering
+
+
 *Deep Learning · IoT Security · Explainable AI*
 
 ---
