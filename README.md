@@ -24,7 +24,7 @@ This project presents a **comprehensive deep learning pipeline** for intrusion d
 
 ---
 
-## 📊 Dataset — WSN-DS
+##  Dataset — WSN-DS
 
 | Property | Value |
 |---|---|
