@@ -9,18 +9,18 @@
 
 ---
 
-## 📌 Overview
+##  Overview
 
 This project presents a **comprehensive deep learning pipeline** for intrusion detection in Wireless Sensor Networks (WSN) using the **WSN-DS dataset**. Beyond classification accuracy, the system addresses five critical dimensions for real-world deployment:
 
 | Dimension | Method | Result |
 |---|---|---|
-| 🎯 **Accuracy** | 8 models benchmarked | Up to **99.68%** |
-| 🔍 **Trustworthiness** | MC Dropout Uncertainty | 99.84% on high-confidence samples |
-| 🔄 **Adaptability** | Concept Drift Detection | +0.85% improvement on drifted data |
-| ⚡ **Deployability** | Energy-Complexity Framework | Edge / Gateway / Cloud tiering |
-| 🧠 **Explainability** | SHAP + LIME + Attention Viz | Per-class local & global explanations |
-| 🛡️ **Robustness** | FGSM Adversarial Testing | Vulnerability boundary quantified |
+|  **Accuracy** | 8 models benchmarked | Up to **99.68%** |
+|  **Trustworthiness** | MC Dropout Uncertainty | 99.84% on high-confidence samples |
+|  **Adaptability** | Concept Drift Detection | +0.85% improvement on drifted data |
+|  **Deployability** | Energy-Complexity Framework | Edge / Gateway / Cloud tiering |
+|  **Explainability** | SHAP + LIME + Attention Viz | Per-class local & global explanations |
+|  **Robustness** | FGSM Adversarial Testing | Vulnerability boundary quantified |
 
 ---
 
@@ -50,7 +50,7 @@ Flooding  ▍                                       0.88%  (  3,312)
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -250,7 +250,7 @@ Reveals **what the model focuses on per attack type** — proving it has learned
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 ### Prerequisites
 ```bash
@@ -276,7 +276,7 @@ python project/Scripts/wsn_novel_c4c5c6.py
 tail -f runs/console.log
 
 # Check if done
-ps aux | grep wsn | grep -v grep && echo "⏳ Running" || echo "✅ Done"
+ps aux | grep wsn | grep -v grep && echo "⏳ Running" || echo " Done"
 
 # Watch output files appear
 watch -n 5 'ls -lh runs/$(ls runs/ -t | head -1)/plots/'
@@ -284,7 +284,7 @@ watch -n 5 'ls -lh runs/$(ls runs/ -t | head -1)/plots/'
 
 ---
 
-## 📁 Output Structure
+##  Output Structure
 
 ```
 runs/
@@ -322,7 +322,7 @@ runs/
 ---
 
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 Iot/
@@ -353,10 +353,11 @@ Iot/
 
 ---
 
-## 👤 Author
+##  Author
 
 **Amlan Sarkar**  
 **Ankit**
+
 B.Tech — Computer Science & Engineering  
 *Deep Learning · IoT Security · Explainable AI*
 
