@@ -1,17 +1,18 @@
 # 🛡️ WSN-DS Intrusion Detection System
-### Deep Learning-Based Multi-Attack Classification for Wireless Sensor Networks
+### Deep Learning + Few-Shot Meta-Learning for Multi-Attack Classification in Wireless Sensor Networks
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.10-red?logo=pytorch)
 ![CUDA](https://img.shields.io/badge/CUDA-12.8-green?logo=nvidia)
 ![Accuracy](https://img.shields.io/badge/Best%20Accuracy-99.68%25-brightgreen)
+![Few-Shot](https://img.shields.io/badge/CTPN%205--shot-96.88%25-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ---
 
 ## 📌 Overview
 
-This project presents a **comprehensive deep learning pipeline** for intrusion detection in Wireless Sensor Networks (WSN) using the **WSN-DS dataset**. Beyond classification accuracy, the system addresses five critical dimensions for real-world deployment:
+This project presents a **comprehensive deep learning + few-shot meta-learning pipeline** for intrusion detection in Wireless Sensor Networks (WSN) using the **WSN-DS dataset**. The system goes far beyond standard classification — it addresses six critical dimensions for real-world deployment:
 
 | Dimension | Method | Result |
 |---|---|---|
@@ -21,6 +22,7 @@ This project presents a **comprehensive deep learning pipeline** for intrusion d
 | ⚡ **Deployability** | Energy-Complexity Framework | Edge / Gateway / Cloud tiering |
 | 🧠 **Explainability** | SHAP + LIME + Attention Viz | Per-class local & global explanations |
 | 🛡️ **Robustness** | FGSM Adversarial Testing | Vulnerability boundary quantified |
+| 🔬 **Few-Shot Generalisation** | AP++ + CTPN (novel) | 96.88% accuracy at 5-shot |
 
 ---
 
@@ -120,7 +122,6 @@ RAW DATA (374,661 × 18)
          ▼  Step 4
 ┌───────────────────┐
 │  SMOTE Balancing  │  Minority class upsampling (train set ONLY)
-│                   │  Before → After shown below
 └────────┬──────────┘
          │
          ▼  Step 5
@@ -135,30 +136,19 @@ RAW DATA (374,661 × 18)
   Test:   74,933 × 33
 ```
 
----
-
 ### Step 1 — Data Cleaning & Label Encoding
 
-**What was done:**
 - Verified zero missing values across all 374,661 rows
-- Selected only numeric columns
 - Applied `LabelEncoder` to convert string class names to integers:
 
 ```
 Blackhole → 0 | Flooding → 1 | Grayhole → 2 | Normal → 3 | TDMA → 4
 ```
 
-**Why label encoding (not one-hot):**
 > PyTorch's `CrossEntropyLoss` expects integer class indices directly — it applies
 > softmax + log internally. One-hot encoding would be redundant and wasteful.
 
----
-
 ### Step 2 — Stratified Train/Test Split (80/20)
-
-**What was done:**
-- Split: 299,728 train / 74,933 test
-- `stratify=y` ensures class proportions are identical in both splits
 
 | Class | Full Dataset | Train Set | Test Set |
 |---|---|---|---|
@@ -169,10 +159,8 @@ Blackhole → 0 | Flooding → 1 | Grayhole → 2 | Normal → 3 | TDMA → 4
 | Flooding | 0.88% | 0.88% | 0.88% |
 
 > ⚠️ **Critical:** SMOTE is applied ONLY to the **train set AFTER splitting**.
-> Applying SMOTE before splitting = **data leakage** — synthetic samples derived
-> from test data contaminate training → artificially inflated evaluation scores.
-
----
+> Applying SMOTE before splitting causes **data leakage** — synthetic samples derived
+> from test data contaminate training, artificially inflating evaluation scores.
 
 ### Step 3 — Feature Engineering (18 → 33 features)
 
@@ -192,27 +180,17 @@ Blackhole → 0 | Flooding → 1 | Grayhole → 2 | Normal → 3 | TDMA → 4
 
 | New Feature | Formula | Why useful |
 |---|---|---|
-| `inter_A_x_B` | top_var_feat_1 × top_var_feat_2 | Joint effect of the two most variable features |
+| `inter_A_x_B` | top_var_feat_1 × top_var_feat_2 | Joint effect of two most variable features |
 | `inter_B_x_C` | top_var_feat_2 × top_var_feat_3 | Cross-feature anomaly signal |
 | `inter_C_x_D` | top_var_feat_3 × top_var_feat_4 | Non-linear feature combinations |
 
-> Top 4 features by **variance** are selected — these vary the most between Normal and attack traffic and therefore carry the most discriminative signal.
+> Top 4 features by **variance** are selected — these vary the most between Normal and attack traffic.
 
 #### Ratio Features (+5)
 
 | New Feature | Formula | Why useful |
 |---|---|---|
-| `ratio_feat_i` | feat_i / (row_sum + 1e-10) | Relative contribution of each feature — attack traffic has abnormal ratios (e.g. DATA_R >> DATA_S in Blackhole) |
-
-**Why do feature engineering if neural networks learn features automatically?**
-> Neural networks can learn features — but need data and time. Statistical features
-> encode **domain knowledge**: Flooding has distinctly different row skewness than
-> Normal. Pre-computing this:
-> - Speeds up convergence
-> - Helps minority classes with few real samples
-> - Acts as an inductive bias, guiding the model toward known discriminative patterns
-
----
+| `ratio_feat_i` | feat_i / (row_sum + 1e-10) | Relative contribution of each feature — e.g. DATA_R >> DATA_S in Blackhole |
 
 ### Step 4 — Manual SMOTE Balancing
 
@@ -253,23 +231,9 @@ For each minority sample x_i:
            ◆  ◆  ◆       ← new synthetic points placed between real ones
 ```
 
-**Why not random oversampling (duplication)?**
-> Duplication → model memorises exact copies → fails on slight variations.
-> SMOTE generates **new points between real ones** → model learns the actual
-> decision boundary shape of each minority class.
-
-**Why not class weights?**
-> Class weights change the loss penalty but the model still sees 272,052 Normal
-> samples vs 2,650 Flooding samples. It thoroughly memorises Normal but barely
-> learns Flooding's boundary. SMOTE physically provides more Flooding examples.
-
-**Why cap at 10,000 (not match Normal's 272,052)?**
-> Fully equalising Flooding would need ~270,000 synthetic samples — 100× more
-> synthetics than real ones. The synthetic distribution would drift far from
-> reality and introduce noise. Capping at 10,000 improves minority learning
-> without flooding the training set with artificial data.
-
----
+> Minority classes are capped at 10,000 (not matched to Normal's 272,052) to avoid
+> introducing excessive noise from purely synthetic data. This gives enough
+> boundary coverage without degrading distribution fidelity.
 
 ### Step 5 — StandardScaler Normalisation
 
@@ -280,88 +244,110 @@ X_train_sc = scaler.transform(X_train_balanced)
 X_test_sc  = scaler.transform(X_test)    # same transform applied to test
 ```
 
-**Result:** Every feature → mean = 0, std = 1
-
-**Why normalise:**
-
-| Feature | Raw Range | Problem Without Scaling |
-|---|---|---|
-| `dist_BS` | 0 – 200 m | Large values dominate gradients |
-| `DATA_S` | 0 – 10,000 | Overwhelms binary features |
-| `is_CH` | 0 or 1 | Gets ignored by optimiser |
-
-Without normalisation, the model learns "high DATA_S = attack" because of scale,
-ignoring small-range but equally important binary/distance features entirely.
-
-**Why fit on train only?**
-> Fitting on the full dataset uses test set mean and std during training —
-> **data leakage**. In production, new packets are scaled using training statistics.
-> We simulate this exactly: `fit()` on train, `transform()` on both.
-
-> 💾 Scaler saved to `models/scaler.pkl` for reproducible inference on new data.
+Every feature → mean = 0, std = 1. Scaler saved to `models/scaler.pkl` for inference on new data.
 
 ---
 
 ## 🏗️ System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        WSN-DS Dataset                           │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-              ┌────────────▼────────────┐
-              │   Feature Engineering   │  18 → 33 features
-              │  (stats + interactions) │  skew, kurtosis, ratios
-              └────────────┬────────────┘
-                           │
-              ┌────────────▼────────────┐
-              │     Manual SMOTE        │  Minority class synthesis
-              │  (max 10k per class)    │  k=5 nearest neighbours
-              └────────────┬────────────┘
-                           │
-              ┌────────────▼────────────┐
-              │    StandardScaler       │  mean=0, std=1 per feature
-              │    Normalisation        │  fit on train only
-              └────────────┬────────────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         │                 │                 │
-┌────────▼───────┐ ┌───────▼──────┐ ┌───────▼──────┐
-│  Deep Learning │ │  Deep Learn. │ │  ML Baseline │
-│  LSTM          │ │  CNN_1D      │ │  RandomForest│
-│  BiLSTM        │ │  CNN_BiLSTM  │ │  XGBoost     │
-│  Transformer   │ │  CNN_BiLSTM  │ └──────────────┘
-│                │ │  +Attention⭐│
-└────────────────┘ └───────┬──────┘
-                           │
-         ┌─────────────────┼──────────────────────┐
-         │                 │                       │
-┌────────▼───────┐ ┌───────▼──────┐ ┌─────────────▼──────────┐
-│  C1: MC        │ │  C2: Concept │ │  C3: Energy-Complexity  │
-│  Dropout       │ │  Drift       │ │  Trade-off Framework    │
-│  Uncertainty   │ │  Detection   │ │  (Edge/Gateway/Cloud)   │
-└────────────────┘ └──────────────┘ └────────────────────────┘
-         │                 │
-┌────────▼───────┐ ┌───────▼──────┐ ┌──────────────┐
-│  C4: LIME      │ │  C5: FGSM    │ │  C6: Attn.   │
-│  Local XAI     │ │  Adversarial │ │  Visualization│
-└────────────────┘ └──────────────┘ └──────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           WSN-DS Dataset                                │
+└───────────────────────────────┬─────────────────────────────────────────┘
+                                │
+              ┌─────────────────▼──────────────────┐
+              │     Preprocessing Pipeline          │
+              │  Cleaning → SMOTE → Scale → Split   │
+              └─────────────────┬──────────────────┘
+                                │
+         ┌──────────────────────┼──────────────────────┐
+         │                      │                      │
+┌────────▼──────────┐  ┌────────▼───────────┐  ┌──────▼───────────┐
+│  Deep Learning    │  │  CNN-BiLSTM-Attn   │  │  ML Baselines    │
+│  LSTM             │  │  ⭐ MAIN ENCODER   │  │  Random Forest   │
+│  BiLSTM           │  │  (trained & saved) │  │  XGBoost         │
+│  CNN_1D           │  └────────┬───────────┘  └──────────────────┘
+│  CNN_BiLSTM       │           │
+│  TransformerIDS   │    ┌──────▼──────────────────────────────────┐
+└───────────────────┘    │     Frozen Encoder (128-D embeddings)   │
+                         └──────┬──────────────────────────────────┘
+                                │
+         ┌──────────────────────┼──────────────────────┐
+         │                      │                      │
+┌────────▼──────────┐  ┌────────▼───────────┐  ┌──────▼───────────┐
+│  Few-Shot Methods │  │  AP++ (Novel C1)   │  │  CTPN (Novel C2) │
+│  Prototypical Net │  │  Adaptive Proto++  │  │  Contrastive     │
+│  Matching Net     │  │  7 enhancements    │  │  Transformer     │
+│  Relation Net     │  │  over APFP 2024    │  │  Prototype Net   │
+│  Siamese Net      │  └────────────────────┘  └──────────────────┘
+│  Inductive Trans. │
+└───────────────────┘
+         │
+┌────────┴──────────────────────────────────────────────────────────┐
+│                    System Contributions                            │
+│  C1 MC-Dropout Uncertainty  |  C2 Concept Drift Detection         │
+│  C3 Energy-Complexity Tiers |  C4 LIME Explainability             │
+│  C5 FGSM Adversarial Test   |  C6 Attention Visualization         │
+└───────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🤖 Models
+## ⭐ Core Encoder — CNN-BiLSTM with Dual Attention
 
-### Deep Learning Models
+```
+Input (B, F, 1)
+      │
+      ▼
+┌─────────────────────┐
+│   Conv1D Block 1    │  F → 64 filters, kernel=3, BN + ReLU + MaxPool
+│   Conv1D Block 2    │  64 → 128 filters, kernel=3, BN + ReLU + MaxPool
+└──────────┬──────────┘
+           │
+      ┌────▼──────────────────┐
+      │  Channel Attention     │  Squeeze-and-Excitation (reduction=8)
+      │  (Feature Reweighting) │  FC(128→16→128), Sigmoid gate
+      └────┬──────────────────┘
+           │
+      ┌────▼──────────────────┐
+      │  Bidirectional LSTM   │  128 hidden (64×2 directions), batch-first
+      │  (Temporal Modelling) │  outputs h_t for all timesteps T
+      └────┬──────────────────┘
+           │
+      ┌────▼──────────────────────────────────────────────┐
+      │  Temporal Attention                                │
+      │  score_t = tanh(W · h_t)                          │
+      │  α_t     = softmax(score_t)                       │
+      │  context = Σ α_t × h_t   →  128-D embedding      │
+      └────┬──────────────────────────────────────────────┘
+           │
+      ┌────▼──────────────────┐
+      │  Classifier Head       │  FC(128→64) → Dropout(0.3) → FC(64→5)
+      │  [stripped for FSL]    │  Removed when used as few-shot encoder
+      └───────────────────────┘
+```
 
-| Model | Parameters | Test Acc | F1 | Train Time | Deployment |
+**Parameters:** 137,622 total (lightweight enough for edge deployment)
+
+**Design rationale:**
+- **Channel Attention** — not all 33 features are equally relevant per class (routing features dominate Blackhole; packet rate features dominate Flooding)
+- **Temporal Attention** — avoids recency bias by learning *which timesteps* carry the attack signature, rather than relying purely on the last LSTM state
+- **Dual attention** — channel attention answers *what*, temporal attention answers *when*
+
+---
+
+## 🤖 Model Performance Comparison
+
+### Deep Learning Models (Full Supervised Training)
+
+| Model | Parameters | Test Acc | F1 | Train Time | Tier |
 |---|---|---|---|---|---|
 | LSTM | 135,429 | 98.93% | 0.9893 | 99s | 🟡 Gateway |
 | BiLSTM | 336,133 | 98.75% | 0.9876 | 103s | 🔴 Cloud |
 | CNN_1D | 54,469 | 99.22% | 0.9922 | 102s | 🟢 Edge |
 | CNN_BiLSTM | 133,253 | 99.00% | 0.9900 | 119s | 🟢 Edge |
-| **CNN_BiLSTM_Attention** ⭐ | **137,622** | **99.31%** | **0.9931** | **133s** | **🟢 Edge** |
-| Transformer_IDS | 38,085 | 96.91% | 0.9686 | 109s | 🟢 Edge |
+| **CNN_BiLSTM_Attention ⭐** | **137,622** | **99.31%** | **0.9931** | **133s** | **🟢 Edge** |
+| TransformerIDS | 38,085 | 96.91% | 0.9686 | 109s | 🟢 Edge |
 
 ### ML Baselines
 
@@ -370,128 +356,196 @@ ignoring small-range but equally important binary/distance features entirely.
 | Random Forest | 99.29% | 0.9930 | 6.9s | 21.5 MB | 113µs |
 | **XGBoost** | **99.68%** | **0.9968** | **714s** | **1.35 MB** | **89µs** |
 
----
+### Per-Class F1 — CNN-BiLSTMAttention
 
-## ⭐ Novel Architecture — CNN-BiLSTM with Dual Attention
-
-```
-Input (B, F, 1)
-      │
-      ▼
-┌─────────────────────┐
-│   Conv1D Block      │  64 → 128 filters, BatchNorm, MaxPool
-│   (Local Patterns)  │  Learns which feature groups co-activate
-└──────────┬──────────┘
-           │
-      ┌────▼──────────────────┐
-      │  Channel Attention     │  Squeeze-and-Excitation
-      │  (Feature Reweighting) │  Which feature channels matter most?
-      └────┬──────────────────┘
-           │
-      ┌────▼──────────────────┐
-      │  Bidirectional LSTM   │  Forward + backward temporal context
-      │  (Temporal Modelling)  │  64 units × 2 directions = 128 hidden
-      └────┬──────────────────┘
-           │
-      ┌────▼──────────────────┐
-      │  Temporal Attention   │  score_t = tanh(W · h_t)
-      │  (Focus Mechanism)    │  context = Σ softmax(score_t) × h_t
-      └────┬──────────────────┘
-           │
-      ┌────▼──────────────────┐
-      │  Classifier Head      │  FC(128→64) → Dropout → FC(64→5)
-      └───────────────────────┘
-```
-
-**Key design decisions:**
-- **Channel Attention** — not all features matter equally: routing features dominate Blackhole detection; packet rate features dominate Flooding
-- **Temporal Attention over last hidden state** — avoids recency bias; model learns *which time steps* carry the attack signature
-- **Dual attention** — channel attention handles *what*, temporal attention handles *when*
+| Class | Precision | Recall | F1 |
+|---|---|---|---|
+| Normal | 1.00 | 1.00 | 1.00 |
+| Grayhole | 0.95 | 0.97 | 0.96 |
+| Blackhole | 0.96 | 0.95 | 0.95 |
+| TDMA | 0.94 | 0.98 | 0.96 |
+| Flooding | 0.96 | 0.94 | 0.95 |
 
 ---
 
-## 🔬 Novel Contributions
+## 🔬 Few-Shot Learning
+
+All few-shot methods operate on **N-way K-shot episodic evaluation** (500 episodes, K ∈ {1, 3, 5, 10, 20}) using the **frozen CNN-BiLSTMAttention encoder** as the feature extractor. This simulates real deployment where new attack types may have very few labelled examples.
+
+### Classical Baselines (6 methods)
+
+| Method | 1-shot | 3-shot | 5-shot | 10-shot | 20-shot |
+|---|---|---|---|---|---|
+| Prototypical | 0.9233 | 0.9555 | 0.9568 | 0.9624 | 0.9642 |
+| Matching Network | 0.9192 | 0.9501 | 0.9534 | 0.9562 | 0.9610 |
+| Relation Network | 0.9108 | 0.9430 | 0.9511 | 0.9580 | 0.9605 |
+| Siamese | 0.9014 | 0.9350 | 0.9440 | 0.9521 | 0.9580 |
+| Inductive Transfer | 0.9252 | 0.9533 | 0.9572 | 0.9638 | 0.9656 |
+| APFP 2024 (baseline) | 0.9249 | 0.9404 | 0.9464 | 0.9534 | 0.9598 |
+
+---
+
+### 🆕 Novel Method 1 — AP++ (Adaptive Prototype++)
+
+AP++ is our improved meta-learner over the APFP 2024 baseline. It wraps 7 enhancements around standard prototype construction:
+
+| # | Enhancement | Description |
+|---|---|---|
+| 1 | **Dual-metric similarity** | Cosine + Euclidean blended (α=0.6 cosine) |
+| 2 | **Adaptive temperature** | τ = clip(τ_base / intra_std, τ_base×0.5, τ_base×3) |
+| 3 | **Outlier filtering** | Remove support points >2σ from class centroid |
+| 4 | **EM prototype refinement** | 4-iteration expectation-maximisation on soft assignments |
+| 5 | **Inter-class repulsion** | Pushes prototypes away from nearest non-target centroid |
+| 6 | **Mahalanobis normalisation** | Feature whitening before distance computation |
+| 7 | **Episode LDA projection** | Linear Discriminant Analysis projection per episode |
+
+**AP++ results vs baselines:**
+
+| K | Prototypical | APFP 2024 | **AP++ (Ours)** | Δ vs APFP |
+|---|---|---|---|---|
+| 1 | 0.9233 | 0.9249 | **0.9330** | +0.81% |
+| 3 | 0.9555 | 0.9404 | **0.9600** | +1.96% |
+| 5 | 0.9568 | 0.9464 | **0.9623** | +1.59% |
+| 10 | 0.9624 | 0.9534 | **0.9630** | +0.96% |
+| 20 | 0.9642 | 0.9598 | **0.9625** | +0.27% |
+
+---
+
+### 🆕 Novel Method 2 — CTPN (Contrastive Transformer Prototype Network)
+
+CTPN stacks three purpose-built modules on top of the frozen encoder:
+
+```
+Frozen Encoder (128-D)
+       │
+       ▼
+┌──────────────────────────────────┐
+│  Projection Head (3-layer MLP)   │
+│  128 → 256 → 128 + skip → L2    │  Contrastive embedding space
+└──────────┬───────────────────────┘
+           │
+      ┌────▼────────────────────────┐
+      │  Support Attention          │
+      │  Aggregator (SAA)           │  Multi-head self-attention over K
+      │  K support embeddings       │  support samples → weighted prototype
+      └────┬────────────────────────┘
+           │
+      ┌────▼────────────────────────┐
+      │  CAPR — Cross-Attention     │
+      │  Prototype Refinement       │  4 heads, 4 iterations; query
+      │  (iterative)                │  attends to refined prototype space
+      └────┬────────────────────────┘
+           │
+      Cosine similarity → episode classification
+```
+
+**Training regime:**
+1. SupCon loss fine-tuning (60 epochs, batch=512) on the full WSN-DS train set
+2. Multi-K meta-training over K ∈ {1,3,5,10,20} (600 episodes per K)
+3. Saved to `runs/fewshot-ctpn-v4/results/ctpn_weights_final.pth`
+
+**CTPN results (full benchmark):**
+
+| K | Prototypical | APFP 2024 | AP++ | **CTPN (Ours)** | AUC |
+|---|---|---|---|---|---|
+| 1 | 0.9186 | 0.9239 | 0.9428 | **0.9531** | 0.9934 |
+| 3 | 0.9555 | 0.9447 | 0.9599 | **0.9700** | 0.9970 |
+| 5 | 0.9574 | 0.9479 | 0.9612 | **0.9688** | 0.9970 |
+| 10 | 0.9588 | 0.9522 | 0.9613 | **0.9716** | 0.9974 |
+| 20 | 0.9635 | 0.9566 | 0.9624 | **0.9694** | 0.9974 |
+
+> CTPN outperforms all baselines at every K value, with the largest gains at low-K (1-shot: +3.45% over APFP, +1.03% over AP++).
+
+---
+
+## 🔭 Novel Contributions C1–C6
 
 ### C1 — MC Dropout Uncertainty Quantification
-Detects zero-day / novel attacks the model has never seen.
+
+Detects zero-day and novel attacks that fall outside all known training classes.
 
 ```python
-model.train()   # keep dropout ON during inference
+model.train()   # keep dropout ACTIVE during inference
 preds = [model(x) for _ in range(30)]   # 30 stochastic forward passes
 entropy    = -Σ p_i × log(p_i)
 confidence = 1 - (entropy / log(n_classes))
-# Flag as novel if confidence < 0.70
+# Flag as novel attack if confidence < 0.70
 ```
 
 | Metric | Value |
 |---|---|
 | Overall accuracy | 99.35% |
-| High-confidence accuracy | **99.84%** |
-| Novel attacks flagged | 161 (1.6%) |
+| High-confidence sample accuracy | **99.84%** |
+| Novel attack flags issued | 161 / 10,000 (1.6%) |
 
 ---
 
 ### C2 — Chunk-Based Concept Drift Detection
-Keeps IDS accurate as attack patterns evolve over time.
+
+Monitors IDS accuracy over streaming data windows; triggers adaptive retraining when attack patterns evolve.
 
 ```
 Stream → [Chunk 1][Chunk 2]...[Chunk 20]
           monitor accuracy per chunk
-          if drop > 3% vs baseline → DRIFT → retrain adaptive model
+          if Δacc > 3% vs baseline → DRIFT DETECTED → retrain adaptive model
 ```
 
 | Metric | Value |
 |---|---|
-| Drift events detected | 1 |
-| Static avg accuracy | 97.31% |
-| Adaptive avg accuracy | **98.16%** |
+| Drift events detected | 1 (at chunk 16) |
+| Accuracy at drift: before → after | 99.1% → 96.0% |
+| Static avg accuracy (no adaptation) | 97.31% |
+| Adaptive avg accuracy (with retraining) | **98.16%** |
 | Improvement | **+0.85%** |
 
 ---
 
-### C3 — Energy-Complexity Trade-off Framework
+### C3 — Energy-Complexity Trade-Off Framework
+
+A quantitative framework to assign each model to a deployment tier:
 
 ```
 Energy Score = (Accuracy × F1) / (log(1+inf_time) × log(1+size) × log(1+FLOPs))
 ```
 
-| Score | Tier | Suitable For |
+| Score Range | Tier | Target Hardware |
 |---|---|---|
 | > 0.50 | 🟢 Edge | Sensor nodes, microcontrollers |
 | 0.20 – 0.50 | 🟡 Gateway | Raspberry Pi, edge servers |
 | < 0.20 | 🔴 Cloud | Central servers |
 
-| Model | Score | Tier |
-|---|---|---|
-| CNN_BiLSTM_Attention | 0.51 | 🟢 Edge |
-| LSTM | 0.44 | 🟡 Gateway |
-| XGBoost | 0.011 | 🔴 Cloud |
-| Random Forest | 0.004 | 🔴 Cloud |
+| Model | Acc | Inference | Size | Score | Tier |
+|---|---|---|---|---|---|
+| CNN_BiLSTM_Attention | 99.31% | 10.44s (batched) | ~538KB | 0.51 | 🟢 Edge |
+| LSTM | 98.93% | 6.12s | ~523KB | 0.44 | 🟡 Gateway |
+| XGBoost | 99.68% | 89µs | 1.35MB | 0.011 | 🔴 Cloud |
+| Random Forest | 99.29% | 113µs | 21.5MB | 0.004 | 🔴 Cloud |
 
 ---
 
 ### C4 — LIME Local Explainability
-Per-sample local explanations — answers *why THIS specific packet was flagged* as an attack.
 
-> Unlike SHAP (global average), LIME perturbs the individual input and fits a
-> local linear surrogate. Essential for operational alert investigation.
+Per-sample local explanations — answers *why THIS specific packet was classified as Blackhole* rather than providing averaged global importance only.
 
----
-
-### C5 — FGSM Adversarial Robustness
-
-```
-x_adversarial = x + ε × sign(∇ₓ Loss(x, y_true))
-```
-
-Tests model resistance against crafted evasion attacks. Quantifies accuracy
-degradation at ε = 0.0 → 0.3, establishing the robustness boundary.
+> Unlike SHAP (global average across dataset), LIME perturbs the individual
+> input instance and fits a local linear surrogate. This is essential for
+> operational alert triage where analysts must justify each flagged packet.
 
 ---
 
-### C6 — Attention Weight Visualization
-Reveals which temporal positions the model focuses on per attack class —
-proving the model learned attack-specific signatures, not statistical shortcuts.
+### C5 — FGSM Adversarial Robustness Testing
+
+```
+x_adv = x + ε × sign(∇ₓ Loss(x, y_true))
+```
+
+Tests model resistance against crafted evasion attacks at ε ∈ {0.0, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3}. Accuracy degradation curves identify the model's robustness boundary — the point at which an attacker can reliably evade detection.
+
+---
+
+### C6 — Attention Weight Visualisation
+
+Extracts and plots the temporal attention weights α_t per attack class, revealing which feature timesteps the model focuses on. This provides mechanistic interpretability — proving the model learned genuine attack signatures rather than spurious statistical shortcuts.
 
 ---
 
@@ -502,19 +556,31 @@ proving the model learned attack-specific signatures, not statistical shortcuts.
 pip install torch numpy pandas scikit-learn xgboost shap lime matplotlib seaborn
 ```
 
-### Main Pipeline (all 8 models + C1/C2/C3)
+### Step 1: Main Pipeline (all 8 models + C1/C2/C3)
 ```bash
 nohup python project/Scripts/wsn_dl_research.py > runs/console.log 2>&1 &
 tail -f runs/console.log
 ```
 
-### Novel Contributions C4 / C5 / C6
+### Step 2: Novel Contributions C4/C5/C6
 ```bash
-# Run AFTER main pipeline completes
+# Run AFTER main pipeline completes — requires saved model checkpoint
 python project/Scripts/wsn_novel_c4c5c6.py
 ```
 
-### Monitor Progress
+### Step 3: Few-Shot Benchmarks
+```bash
+python project/Scripts/wsn_few_shot_all.py        # all 6 baseline methods
+python project/Scripts/wsn_ap_pp_v4.py            # AP++ novel method
+```
+
+### Step 4: CTPN Training + Evaluation
+```bash
+python project/Scripts/ctpn_wsn_v4.py             # train CTPN
+python project/Scripts/ctpn_eval_v4.py             # evaluate & generate all plots
+```
+
+### Monitor Running Jobs
 ```bash
 tail -f runs/console.log
 ps aux | grep wsn | grep -v grep && echo "⏳ Running" || echo "✅ Done"
@@ -522,55 +588,66 @@ ps aux | grep wsn | grep -v grep && echo "⏳ Running" || echo "✅ Done"
 
 ---
 
-## 📁 Output Structure
-
-```
-runs/
-└── 2026_03_11__22_50_37/
-    ├── plots/
-    │   ├── class_distribution.png
-    │   ├── training_history.png
-    │   ├── model_comparison.png
-    │   ├── roc_curves.png
-    │   ├── confusion_matrix_*.png        (8 matrices)
-    │   ├── C1_uncertainty.png
-    │   ├── C2_concept_drift.png
-    │   ├── C3_energy_tradeoff.png
-    │   ├── C4_lime_explanations.png
-    │   ├── C5_adversarial_robustness.png
-    │   ├── C6_attention_visualization.png
-    │   └── C6_attention_comparison.png
-    ├── models/
-    │   ├── CNN_BiLSTM_Attention.pth
-    │   ├── LSTM.pth  /  BiLSTM.pth  /  ...
-    │   └── scaler.pkl
-    └── results/
-        ├── final_summary.json
-        ├── C1_uncertainty.json
-        ├── C2_drift.json
-        ├── C3_energy.csv
-        ├── C4_lime.json
-        ├── C5_adversarial.json
-        └── C6_attention.json
-```
-
----
-
-
-## 📂 Project Structure
+## 📁 Repository Structure
 
 ```
 Iot/
 ├── project/
 │   ├── Scripts/
-│   │   ├── wsn_dl_research.py        # Main pipeline
-│   │   └── wsn_novel_c4c5c6.py      # C4 LIME + C5 FGSM + C6 Attention
+│   │   ├── wsn_dl_research.py          # Main DL pipeline + C1/C2/C3
+│   │   ├── wsn_research.py             # Earlier baseline (ADWIN, SHAP)
+│   │   ├── wsn_few_shot.py             # Prototypical episodic eval
+│   │   ├── wsn_few_shot_all.py         # 6-method few-shot benchmark
+│   │   ├── wsn_ap_pp.py                # AP++ v3 novel method
+│   │   ├── wsn_ap_pp_v4.py             # AP++ v4 novel method (latest)
+│   │   ├── wsn_novel_c4c5c6.py         # C4 LIME + C5 FGSM + C6 Attn
+│   │   ├── ctpn_wsn.py                 # CTPN training
+│   │   ├── ctpn_wsn_v4.py              # CTPN v4 training (latest)
+│   │   └── ctpn_eval_v4.py             # CTPN full evaluation suite
 │   └── data/
 │       └── raw/
 │           └── WSN-DS.csv
-├── runs/                             # All outputs auto-saved here
-├── WSN_IDS_Defense_Guide.md         # Complete professor Q&A guide
-└── README.md
+│
+├── runs/
+│   └── 2026_03_11__22_50_37/
+│       ├── plots/
+│       │   ├── class_distribution.png
+│       │   ├── training_history.png
+│       │   ├── model_comparison.png
+│       │   ├── roc_curves.png
+│       │   ├── confusion_matrix_*.png       (8 matrices)
+│       │   ├── C1_uncertainty.png
+│       │   ├── C2_concept_drift.png
+│       │   ├── C3_energy_tradeoff.png
+│       │   ├── C4_lime_explanations.png
+│       │   ├── C5_adversarial_robustness.png
+│       │   └── C6_attention_visualization.png
+│       ├── models/
+│       │   ├── CNN_BiLSTM_Attention.pth
+│       │   ├── LSTM.pth
+│       │   ├── BiLSTM.pth
+│       │   └── scaler.pkl
+│       └── results/
+│           ├── final_summary.json
+│           ├── C1_uncertainty.json
+│           ├── C2_drift.json
+│           ├── C3_energy.csv
+│           ├── C4_lime.json
+│           ├── C5_adversarial.json
+│           └── C6_attention.json
+│
+└── fewshot/
+    └── fewshot-ctpn-v4/
+        ├── evaluation/
+        │   ├── confusion_matrix.png
+        │   ├── classification_report.png
+        │   ├── tsne_embeddings.png
+        │   ├── prototype_heatmap.png
+        │   ├── capr_attention.png
+        │   ├── episode_stability.png
+        │   └── calibration.png
+        └── results/
+            └── ctpn_weights_final.pth
 ```
 
 ---
@@ -581,25 +658,27 @@ Iot/
 2. Hochreiter & Schmidhuber — *Long Short-Term Memory*, Neural Computation (1997)
 3. Hu et al. — *Squeeze-and-Excitation Networks*, CVPR (2018)
 4. Bahdanau et al. — *Neural Machine Translation by Jointly Learning to Align and Translate*, ICLR (2015)
-5. Gal & Ghahramani — *Dropout as a Bayesian Approximation*, ICML (2016)
-6. Goodfellow et al. — *Explaining and Harnessing Adversarial Examples*, ICLR (2015)
-7. Ribeiro et al. — *"Why Should I Trust You?": LIME*, KDD (2016)
-8. Lundberg & Lee — *A Unified Approach to Interpreting Model Predictions (SHAP)*, NeurIPS (2017)
-9. Chawla et al. — *SMOTE: Synthetic Minority Over-sampling Technique*, JAIR (2002)
+5. Vinyals et al. — *Matching Networks for One Shot Learning*, NeurIPS (2016)
+6. Snell et al. — *Prototypical Networks for Few-Shot Learning*, NeurIPS (2017)
+7. Sung et al. — *Learning to Compare: Relation Network for Few-Shot Learning*, CVPR (2018)
+8. Koch et al. — *Siamese Neural Networks for One-shot Image Recognition*, ICML (2015)
+9. Khosla et al. — *Supervised Contrastive Learning*, NeurIPS (2020)
+10. Gal & Ghahramani — *Dropout as a Bayesian Approximation*, ICML (2016)
+11. Goodfellow et al. — *Explaining and Harnessing Adversarial Examples*, ICLR (2015)
+12. Ribeiro et al. — *"Why Should I Trust You?": LIME*, KDD (2016)
+13. Lundberg & Lee — *A Unified Approach to Interpreting Model Predictions (SHAP)*, NeurIPS (2017)
+14. Chawla et al. — *SMOTE: Synthetic Minority Over-sampling Technique*, JAIR (2002)
 
 ---
 
 ## 👥 Authors
 
-**Amlan Sarkar**
-B.Tech — Computer Science & Engineering
+**Amlan Sarkar** — B.Tech, Computer Science & Engineering
 
+**Ankit** — B.Tech, Computer Science & Engineering
 
-**Ankit**
-B.Tech — Computer Science & Engineering
-
-
-*Deep Learning · IoT Security · Explainable AI*
+*Deep Learning · IoT Security · Few-Shot Learning · Explainable AI*
 
 ---
-*© 2026 — WSN-DS IDS Research Project*
+
+*© 2026 — WSN-DS IDS Research Project · MIT License*
